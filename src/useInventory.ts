@@ -15,12 +15,15 @@ export interface InventoryItem {
 
 export interface AssemblyData {
   id: string;
+  itemId: number;
   kind: string; // "StorageUnit" | "NetworkNode" | "Assembly" etc.
   name: string;
   typeId: number;
   statusOnline: boolean;
   ownerCapId: string;
+  energySourceId: string;
   locationHash: string;
+  solarSystemId: number;
   // SSU-specific
   maxCapacity: number;
   usedCapacity: number;
@@ -143,11 +146,14 @@ function parseAssembly(
 
   return {
     id,
+    itemId: Number(json.key?.item_id ?? 0),
     kind,
     name: json.metadata?.name || "",
     typeId: Number(json.type_id ?? 0),
     statusOnline: json.status?.status?.["@variant"] === "ONLINE",
     ownerCapId: json.owner_cap_id ?? "",
+    energySourceId: json.energy_source_id ?? "",
+    solarSystemId: Number(json.location?.solar_system_id?.item_id ?? 0),
     locationHash: json.location?.location_hash ?? "",
     maxCapacity: totalMaxCapacity,
     usedCapacity: totalUsedCapacity,

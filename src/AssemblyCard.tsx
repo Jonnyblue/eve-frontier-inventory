@@ -4,8 +4,15 @@ import type { ItemType } from "./worldApi";
 import { getItemType } from "./worldApi";
 import { RecipeList } from "./RecipeList";
 import type { Recipe } from "./recipes";
+import {
+  useSponsoredTransaction,
+  SponsoredTransactionActions,
+  Assemblies,
+  State,
+  WalletSponsoredTransactionNotSupportedError,
+} from "@evefrontier/dapp-kit";
 
-// type_id → assembly type mapping
+// type_id → recipe assembly type mapping
 const ASSEMBLY_TYPE_MAP: Record<number, Recipe["assemblyType"]> = {
   88063: "refinery",
   88069: "mini_berth",
@@ -13,15 +20,59 @@ const ASSEMBLY_TYPE_MAP: Record<number, Recipe["assemblyType"]> = {
   88068: "assembler",
 };
 
+// type_id → Assemblies enum for sponsored transactions
+const TYPEID_TO_ASSEMBLIES: Record<number, Assemblies> = {
+  88063: Assemblies.Refinery,
+  87119: Assemblies.Manufacturing,
+  88068: Assemblies.Manufacturing,
+  88069: Assemblies.Manufacturing,
+  88082: Assemblies.SmartStorageUnit,
+  88092: Assemblies.NetworkNode,
+};
+
+
 interface Props {
   assembly: AssemblyData;
   itemTypes?: Map<number, ItemType>;
   isHub?: boolean;
+  onRefetch?: () => void;
 }
 
-export function AssemblyCard({ assembly, itemTypes, isHub }: Props) {
+export function AssemblyCard({ assembly, itemTypes, isHub, onRefetch }: Props) {
   const [showRecipes, setShowRecipes] = useState(false);
+  const [toggleError, setToggleError] = useState<string | null>(null);
+  const { mutate: sendTx, isPending: isToggling } = useSponsoredTransaction();
   const assemblyType = ASSEMBLY_TYPE_MAP[assembly.typeId];
+  const assembliesType = TYPEID_TO_ASSEMBLIES[assembly.typeId] ?? Assemblies.Assembly;
+
+  const handleToggle = () => {
+    setToggleError(null);
+    sendTx(
+      {
+        txAction: assembly.statusOnline
+          ? SponsoredTransactionActions.BRING_OFFLINE
+          : SponsoredTransactionActions.BRING_ONLINE,
+        assembly: {
+          type: assembliesType,
+          item_id: assembly.itemId,
+          id: assembly.id,
+          name: assembly.name,
+          state: assembly.statusOnline ? State.ONLINE : State.ANCHORED,
+        } as any,
+        tenant: "stillness",
+      },
+      {
+        onSuccess: () => onRefetch?.(),
+        onError: (err) => {
+          if (err instanceof WalletSponsoredTransactionNotSupportedError) {
+            setToggleError("Requires EVE Vault wallet");
+          } else {
+            setToggleError(err.message);
+          }
+        },
+      },
+    );
+  };
   const typeInfo = itemTypes?.get(assembly.typeId);
   const displayName =
     assembly.name || typeInfo?.name || `Assembly #${assembly.typeId}`;
@@ -62,7 +113,7 @@ export function AssemblyCard({ assembly, itemTypes, isHub }: Props) {
             </span>
           )}
         </div>
-        <div style={{ textAlign: "right" }}>
+        <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
           <span
             style={{
               color: assembly.statusOnline
@@ -74,6 +125,24 @@ export function AssemblyCard({ assembly, itemTypes, isHub }: Props) {
           >
             {assembly.statusOnline ? "ONLINE" : "OFFLINE"}
           </span>
+          {!isHub && assembly.itemId > 0 && (
+            <button
+              onClick={handleToggle}
+              disabled={isToggling}
+              style={{ fontSize: "0.75rem", padding: "3px 10px" }}
+            >
+              {isToggling
+                ? "..."
+                : assembly.statusOnline
+                  ? "Take Offline"
+                  : "Bring Online"}
+            </button>
+          )}
+          {toggleError && (
+            <span style={{ fontSize: "0.7rem", color: "#ef4444", maxWidth: "160px", textAlign: "right" }}>
+              {toggleError}
+            </span>
+          )}
         </div>
       </div>
 

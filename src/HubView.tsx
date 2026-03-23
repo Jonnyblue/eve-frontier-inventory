@@ -43,7 +43,7 @@ export function HubView() {
 
       {data?.hub && (
         <div>
-          <AssemblyCard assembly={data.hub} itemTypes={itemTypes} isHub />
+          <AssemblyCard assembly={data.hub} itemTypes={itemTypes} isHub onRefetch={refetch} />
 
           {data.connected.length > 0 && (
             <div className="section">
@@ -51,7 +51,7 @@ export function HubView() {
                 Connected Assemblies ({data.connected.length})
               </h2>
               {data.connected.map((a) => (
-                <AssemblyCard key={a.id} assembly={a} itemTypes={itemTypes} />
+                <AssemblyCard key={a.id} assembly={a} itemTypes={itemTypes} onRefetch={refetch} />
               ))}
             </div>
           )}

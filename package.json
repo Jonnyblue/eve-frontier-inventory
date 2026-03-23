@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fetch-map-data": "node scripts/fetchMapData.mjs"
   },
   "dependencies": {
     "@evefrontier/dapp-kit": "^0.1.5",

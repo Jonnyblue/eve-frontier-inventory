@@ -6,6 +6,8 @@ import { AssemblyLookup } from "./AssemblyLookup";
 import { AllRecipes } from "./AllRecipes";
 import { ManualInventory, useManualInventory } from "./ManualInventory";
 import { CraftingCalculator } from "./CraftingCalculator";
+import { Killboard } from "./Killboard";
+import { UniverseMap } from "./UniverseMap";
 import { useItemTypes } from "./useItemTypes";
 import { useHubInventory } from "./useInventory";
 
@@ -16,7 +18,7 @@ function App() {
   const { handleConnect, handleDisconnect } = useConnection();
   const account = useCurrentAccount();
   const [tab, setTab] = useState<
-    "hub" | "lookup" | "recipes" | "inventory" | "calculator"
+    "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map"
   >("calculator");
   const manualInventory = useManualInventory();
   const { data: itemTypes } = useItemTypes();
@@ -76,6 +78,18 @@ function App() {
         >
           Lookup
         </button>
+        <button
+          className={`tab ${tab === "killboard" ? "active" : ""}`}
+          onClick={() => setTab("killboard")}
+        >
+          Killboard
+        </button>
+        <button
+          className={`tab ${tab === "map" ? "active" : ""}`}
+          onClick={() => setTab("map")}
+        >
+          Map
+        </button>
       </div>
 
       {tab === "calculator" ? (
@@ -93,6 +107,13 @@ function App() {
         <HubView />
       ) : tab === "recipes" ? (
         <AllRecipes />
+      ) : tab === "killboard" ? (
+        <Killboard />
+      ) : tab === "map" ? (
+        <UniverseMap structures={[
+          ...(hubData?.hub ? [hubData.hub] : []),
+          ...(hubData?.connected ?? []),
+        ]} />
       ) : (
         <AssemblyLookup />
       )}
