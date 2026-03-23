@@ -1,0 +1,438 @@
+:root {
+  --color-background: #0B0B0B;
+  --color-text: #FAFAE5;
+  --color-text-muted: rgba(250, 250, 229, 0.7);
+  --color-border: rgba(250, 250, 229, 0.2);
+  --color-button-background: rgba(250, 250, 229, 0.1);
+  --color-button-hover: rgba(250, 250, 229, 0.15);
+  --color-accent: #4ade80;
+  --color-surface: rgba(250, 250, 229, 0.03);
+  --color-surface-hover: rgba(250, 250, 229, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Favorit", "ABC Favorit Mono", monospace;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Frontier Disket Mono", "Fronter Disket Mono", monospace;
+  font-weight: 400;
+  color: var(--color-text);
+  line-height: 120%;
+  margin: 0;
+}
+
+p, span, label {
+  font-family: "Favorit", "ABC Favorit Mono", "Favorit Mono", monospace;
+  font-weight: 300;
+  font-size: 1rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+button {
+  font-family: "Frontier Disket Mono", monospace;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -0.02em;
+  background-color: var(--color-button-background);
+  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+button:hover {
+  background-color: var(--color-button-hover);
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  color: var(--color-text-muted);
+}
+
+.ssu-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.ssu-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ssu-card-header h3 {
+  font-size: 1rem;
+}
+
+.capacity-bar {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.capacity-bar-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+.item-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.item-table th {
+  text-align: left;
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.item-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.item-table tr:last-child td {
+  border-bottom: none;
+}
+
+.item-table tr:hover td {
+  background: var(--color-surface-hover);
+}
+
+.category-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--color-button-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+}
+
+.loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+}
+
+.error {
+  text-align: center;
+  padding: 24px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.summary-card .label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.summary-card .value {
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 1.5rem;
+}
+
+.all-items-table {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-family: "Favorit", monospace;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--color-text-muted);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.tab {
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  color: var(--color-text);
+  background: none;
+}
+
+.tab.active {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+}
+
+.address-text {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-family: "Favorit Mono", monospace;
+}
+
+/* Recipe styles */
+.recipe-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.recipe-flow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.recipe-side {
+  flex: 1;
+}
+
+.recipe-side-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  font-family: "Frontier Disket Mono", monospace;
+}
+
+.recipe-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 0.85rem;
+}
+
+.recipe-qty {
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.recipe-arrow {
+  display: flex;
+  align-items: center;
+  padding-top: 18px;
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+}
+
+.recipes-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.recipes-toggle {
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  background: var(--color-button-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.recipes-toggle:hover {
+  color: var(--color-text);
+  background: var(--color-button-hover);
+}
+
+/* Dropdown */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #1a1a1a;
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 100;
+}
+
+.dropdown-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.1s;
+}
+
+.dropdown-item:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Production tree */
+.tree-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.1s;
+}
+
+.tree-row:hover {
+  background: var(--color-surface-hover);
+}
+
+.alt-recipe-btn {
+  font-family: "Frontier Disket Mono", monospace;
+  font-size: 0.6rem;
+  padding: 1px 6px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 3px;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.alt-recipe-btn:hover {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.alt-recipe-option {
+  padding: 6px 10px;
+  margin: 4px 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.1s;
+}
+
+.alt-recipe-option:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-text-muted);
+}
