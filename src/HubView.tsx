@@ -1,43 +1,18 @@
-import { useState } from "react";
 import { usePlayerHubs } from "./useInventory";
 import { useItemTypes } from "./useItemTypes";
 import { AssemblyCard } from "./AssemblyCard";
+import { useConnection } from "@evefrontier/dapp-kit";
 
-const WALLET_KEY = "eve-frontier-wallet-address";
-
-interface HubViewProps {
-  walletAddress: string;
-  onSetWalletAddress: (addr: string) => void;
-}
-
-export function HubView({ walletAddress, onSetWalletAddress }: HubViewProps) {
-  const [inputValue, setInputValue] = useState(walletAddress);
-  const { data, isLoading, error, refetch } = usePlayerHubs(walletAddress || undefined);
+export function HubView() {
+  const { walletAddress } = useConnection();
+  const { data, isLoading, error, refetch } = usePlayerHubs(walletAddress);
   const { data: itemTypes } = useItemTypes();
 
   return (
     <div>
-      <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
-        <input
-          type="text"
-          className="search-input"
-          style={{ marginBottom: 0 }}
-          placeholder="Enter wallet address (0x...)"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") onSetWalletAddress(inputValue.trim());
-          }}
-        />
-        <button onClick={() => onSetWalletAddress(inputValue.trim())}>Load</button>
-      </div>
-
       {!walletAddress && (
         <div className="empty-state">
-          <p>Enter your wallet address to load your hubs</p>
-          <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", marginTop: "8px" }}>
-            Your wallet address starts with 0x — find it in-game or in your EVE Vault wallet
-          </p>
+          <p>Connect your EVE Vault wallet to load your hubs</p>
         </div>
       )}
 

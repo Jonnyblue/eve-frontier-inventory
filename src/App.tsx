@@ -8,25 +8,17 @@ import { Killboard } from "./Killboard";
 import { UniverseMap } from "./UniverseMap";
 import { useItemTypes } from "./useItemTypes";
 import { usePlayerHubs } from "./useInventory";
-
-const WALLET_KEY = "eve-frontier-wallet-address";
+import { useConnection } from "@evefrontier/dapp-kit";
 
 function App() {
   const [tab, setTab] = useState<
     "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map"
   >("calculator");
-  const [walletAddress, setWalletAddress] = useState<string>(
-    () => localStorage.getItem(WALLET_KEY) ?? ""
-  );
+  const { walletAddress, isConnected, hasEveVault, handleConnect, handleDisconnect } = useConnection();
+
   const manualInventory = useManualInventory();
   const { data: itemTypes } = useItemTypes();
-  const { data: playerData } = usePlayerHubs(walletAddress || undefined);
-
-  const handleSetWalletAddress = (addr: string) => {
-    setWalletAddress(addr);
-    if (addr) localStorage.setItem(WALLET_KEY, addr);
-    else localStorage.removeItem(WALLET_KEY);
-  };
+  const { data: playerData } = usePlayerHubs(walletAddress);
 
   // Collect SSU items from all hubs' connected assemblies
   const ssuItems = playerData?.connected.filter((a) => a.items.length > 0);
@@ -35,6 +27,13 @@ function App() {
     <div className="app-container">
       <div className="header">
         <h1>EVE FRONTIER INVENTORY</h1>
+        {isConnected ? (
+          <button className="btn-secondary" onClick={handleDisconnect}>Disconnect</button>
+        ) : (
+          <button className="btn-secondary" onClick={handleConnect} disabled={!hasEveVault}>
+            {hasEveVault ? "Connect EVE Vault" : "Install EVE Vault"}
+          </button>
+        )}
       </div>
 
       <div className="tab-bar">
@@ -95,7 +94,7 @@ function App() {
           itemTypes={itemTypes}
         />
       ) : tab === "hub" ? (
-        <HubView walletAddress={walletAddress} onSetWalletAddress={handleSetWalletAddress} />
+        <HubView />
       ) : tab === "recipes" ? (
         <AllRecipes />
       ) : tab === "killboard" ? (
