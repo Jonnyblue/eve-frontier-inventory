@@ -268,6 +268,13 @@ button:hover {
   margin-bottom: 24px;
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -281,6 +288,8 @@ button:hover {
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .tab:hover {
@@ -310,8 +319,10 @@ button:hover {
 .recipe-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .recipe-flow {
@@ -334,9 +345,10 @@ button:hover {
 }
 
 .recipe-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
+  gap: 6px;
   padding: 3px 0;
   font-size: 0.85rem;
 }
@@ -345,8 +357,8 @@ button:hover {
   font-family: "Frontier Disket Mono", monospace;
   font-size: 0.85rem;
   color: var(--color-text);
-  margin-left: 12px;
   white-space: nowrap;
+  text-align: right;
 }
 
 .recipe-arrow {
@@ -355,6 +367,19 @@ button:hover {
   padding-top: 18px;
   font-size: 1.2rem;
   color: var(--color-text-muted);
+}
+
+@media (max-width: 520px) {
+  .recipe-flow {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .recipe-arrow {
+    padding-top: 0;
+    align-self: center;
+    transform: rotate(90deg);
+  }
 }
 
 .recipes-section {

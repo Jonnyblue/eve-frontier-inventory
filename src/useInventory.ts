@@ -99,6 +99,19 @@ query GetOwnedObjects($owner: SuiAddress!, $type: String, $cursor: String) {
 }
 `;
 
+const ALL_OWNED_OBJECTS_QUERY = `
+query GetAllOwnedObjects($owner: SuiAddress!) {
+  address(address: $owner) {
+    objects(first: 50) {
+      nodes {
+        address
+        contents { type { repr } json }
+      }
+    }
+  }
+}
+`;
+
 function parseAssembly(
   id: string,
   typeRepr: string,
@@ -209,12 +222,8 @@ async function fetchConnectedAssemblies(
 
 export async function fetchPlayerAssemblies(
   walletAddress: string,
-): Promise<{
-  hub: AssemblyData | null;
-  connected: AssemblyData[];
-  storageUnits: AssemblyData[];
-}> {
-  // First, find the PlayerProfile to get character_id
+): Promise<{ hubs: AssemblyData[]; connected: AssemblyData[] }> {
+  // Step 1: wallet → PlayerProfile → character_id
   const profileType = `${WORLD_PACKAGE_ID}::character::PlayerProfile`;
   const profileRes: any = await executeGraphQLQuery(OWNED_OBJECTS_QUERY, {
     owner: walletAddress,
@@ -222,25 +231,42 @@ export async function fetchPlayerAssemblies(
   });
 
   const profileNodes = profileRes.data?.address?.objects?.nodes ?? [];
-  if (profileNodes.length === 0) {
-    return { hub: null, connected: [], storageUnits: [] };
-  }
+  if (profileNodes.length === 0) return { hubs: [], connected: [] };
 
   const characterId = profileNodes[0].contents?.json?.character_id;
-  if (!characterId) {
-    return { hub: null, connected: [], storageUnits: [] };
-  }
+  if (!characterId) return { hubs: [], connected: [] };
 
-  // Find all objects — we need to look for NetworkNodes and StorageUnits
-  // Since they're shared objects, we need to search by type globally
-  // For now, let's search for assemblies that reference this character's owner_cap
-  // We'll start by fetching the character to get its address, then look for assemblies
+  // Step 2: character → all OwnerCaps → find NetworkNode IDs
+  const capsRes: any = await executeGraphQLQuery(ALL_OWNED_OBJECTS_QUERY, {
+    owner: characterId,
+  });
 
-  // Try to find NetworkNode by querying all of them and filtering by owner_cap
-  // This is expensive, so in production you'd want an indexer
-  // For now, let's allow the user to provide their hub ID directly
+  const capNodes = capsRes.data?.address?.objects?.nodes ?? [];
+  const networkNodeIds: string[] = capNodes
+    .filter((n: any) => n.contents?.type?.repr?.includes("network_node"))
+    .map((n: any) => n.contents?.json?.authorized_object_id)
+    .filter(Boolean);
 
-  return { hub: null, connected: [], storageUnits: [] };
+  if (networkNodeIds.length === 0) return { hubs: [], connected: [] };
+
+  // Step 3: fetch each NetworkNode hub + its connected assemblies
+  const results = await Promise.all(
+    networkNodeIds.map((id) => fetchHubAndConnected(id)),
+  );
+
+  const hubs = results.map((r) => r.hub).filter(Boolean) as AssemblyData[];
+  const connected = results.flatMap((r) => r.connected);
+
+  return { hubs, connected };
+}
+
+export function usePlayerHubs(walletAddress: string | undefined) {
+  return useQuery({
+    queryKey: ["playerHubs", walletAddress],
+    queryFn: () => fetchPlayerAssemblies(walletAddress!),
+    enabled: !!walletAddress,
+    staleTime: 30_000,
+  });
 }
 
 export async function fetchHubAndConnected(

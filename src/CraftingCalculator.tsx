@@ -2,7 +2,9 @@ import { useState, useMemo } from "react";
 import type { ManualItem } from "./ManualInventory";
 import type { AssemblyData } from "./useInventory";
 import type { ItemType } from "./worldApi";
+import { buildNameToTypeIdMap } from "./worldApi";
 import type { Recipe } from "./recipes";
+import { ItemIcon } from "./ItemIcon";
 import {
   buildRecipeIndex,
   getCraftableOutputs,
@@ -38,6 +40,10 @@ export function CraftingCalculator({
 
   const craftableOutputs = useMemo(() => getCraftableOutputs(), []);
   const recipeIndex = useMemo(() => buildRecipeIndex(), []);
+  const nameToTypeId = useMemo(
+    () => (itemTypes ? buildNameToTypeIdMap(itemTypes) : new Map<string, number>()),
+    [itemTypes],
+  );
 
   const filteredOutputs = useMemo(() => {
     if (!search) return craftableOutputs.slice(0, 30);
@@ -142,6 +148,7 @@ export function CraftingCalculator({
                   className="dropdown-item"
                   onClick={() => handleSelect(o.name)}
                 >
+                  <ItemIcon typeId={nameToTypeId.get(o.name)} />
                   <span>{o.name}</span>
                   <span
                     className="category-badge"
@@ -170,7 +177,8 @@ export function CraftingCalculator({
                   marginBottom: "8px",
                 }}
               >
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <ItemIcon typeId={nameToTypeId.get(selectedItem)} size={24} />
                   <span style={{ fontWeight: 400, fontSize: "1.1rem" }}>
                     {selectedItem}
                   </span>
@@ -278,6 +286,7 @@ export function CraftingCalculator({
             <MaterialTable
               materials={rawMaterials}
               title="Raw materials to gather/mine"
+              nameToTypeId={nameToTypeId}
             />
           )}
 
@@ -285,6 +294,7 @@ export function CraftingCalculator({
             <MaterialTable
               materials={allMaterials}
               title="All materials (intermediate + raw)"
+              nameToTypeId={nameToTypeId}
             />
           )}
 
@@ -292,6 +302,7 @@ export function CraftingCalculator({
             <TreeView
               node={tree}
               depth={0}
+              nameToTypeId={nameToTypeId}
               onOverride={(name, recipeId) => {
                 const next = new Map(recipeOverrides);
                 next.set(name, recipeId);
@@ -324,9 +335,11 @@ export function CraftingCalculator({
 function MaterialTable({
   materials,
   title,
+  nameToTypeId,
 }: {
   materials: MaterialSummary[];
   title: string;
+  nameToTypeId: Map<string, number>;
 }) {
   if (materials.length === 0) {
     return (
@@ -367,7 +380,12 @@ function MaterialTable({
           <tbody>
             {materials.map((m) => (
               <tr key={m.name}>
-                <td>{m.name}</td>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <ItemIcon typeId={nameToTypeId.get(m.name)} />
+                    {m.name}
+                  </div>
+                </td>
                 <td>
                   <span className="category-badge">
                     {m.isRaw ? "raw" : "crafted"}
@@ -416,10 +434,12 @@ function MaterialTable({
 function TreeView({
   node,
   depth,
+  nameToTypeId,
   onOverride,
 }: {
   node: ProductionNode;
   depth: number;
+  nameToTypeId: Map<string, number>;
   onOverride: (name: string, recipeId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(depth < 2);
@@ -455,6 +475,7 @@ function TreeView({
             </span>
           )}
           {!hasChildren && <span style={{ width: "12px" }} />}
+          <ItemIcon typeId={nameToTypeId.get(node.name)} size={16} />
           <span style={{ fontWeight: depth === 0 ? 400 : 300 }}>
             {node.name}
           </span>
@@ -592,6 +613,7 @@ function TreeView({
             key={`${child.name}-${i}`}
             node={child}
             depth={depth + 1}
+            nameToTypeId={nameToTypeId}
             onOverride={onOverride}
           />
         ))}

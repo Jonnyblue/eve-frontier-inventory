@@ -54,3 +54,13 @@ export function getItemType(
 ): ItemType | undefined {
   return types.get(typeId);
 }
+
+export function buildNameToTypeIdMap(
+  types: Map<number, ItemType>,
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const [id, type] of types) {
+    map.set(type.name, id);
+  }
+  return map;
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AssemblyData } from "./useInventory";
 import type { ItemType } from "./worldApi";
 import { getItemType } from "./worldApi";
+import { ItemIcon } from "./ItemIcon";
 import { RecipeList } from "./RecipeList";
 import type { Recipe } from "./recipes";
 import {
@@ -255,7 +256,12 @@ export function AssemblyCard({ assembly, itemTypes, isHub, onRefetch }: Props) {
                     : undefined;
                   return (
                     <tr key={item.typeId}>
-                      <td>{it?.name ?? `#${item.typeId}`}</td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <ItemIcon typeId={item.typeId} />
+                          {it?.name ?? `#${item.typeId}`}
+                        </div>
+                      </td>
                       <td>
                         <span className="category-badge">
                           {it?.categoryName ?? "Unknown"}

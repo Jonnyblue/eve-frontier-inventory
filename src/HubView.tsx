@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useHubInventory } from "./useInventory";
+import { usePlayerHubs } from "./useInventory";
 import { useItemTypes } from "./useItemTypes";
 import { AssemblyCard } from "./AssemblyCard";
 
+const WALLET_KEY = "eve-frontier-wallet-address";
+
 interface HubViewProps {
-  hubId: string;
-  onSetHubId: (id: string) => void;
+  walletAddress: string;
+  onSetWalletAddress: (addr: string) => void;
 }
 
-export function HubView({ hubId, onSetHubId }: HubViewProps) {
-  const [inputValue, setInputValue] = useState(hubId);
-  const { data, isLoading, error, refetch } = useHubInventory(hubId || undefined);
+export function HubView({ walletAddress, onSetWalletAddress }: HubViewProps) {
+  const [inputValue, setInputValue] = useState(walletAddress);
+  const { data, isLoading, error, refetch } = usePlayerHubs(walletAddress || undefined);
   const { data: itemTypes } = useItemTypes();
 
   return (
@@ -20,69 +22,61 @@ export function HubView({ hubId, onSetHubId }: HubViewProps) {
           type="text"
           className="search-input"
           style={{ marginBottom: 0 }}
-          placeholder="Enter Network Node / Hub object ID (0x...)"
+          placeholder="Enter wallet address (0x...)"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") onSetHubId(inputValue.trim());
+            if (e.key === "Enter") onSetWalletAddress(inputValue.trim());
           }}
         />
-        <button onClick={() => onSetHubId(inputValue.trim())}>Load</button>
+        <button onClick={() => onSetWalletAddress(inputValue.trim())}>Load</button>
       </div>
 
-      {!hubId && (
+      {!walletAddress && (
         <div className="empty-state">
-          <p>Enter your Network Node object ID above to load your hub</p>
+          <p>Enter your wallet address to load your hubs</p>
           <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", marginTop: "8px" }}>
-            Find it in-game or on the EVE Frontier explorer. It starts with 0x...
+            Your wallet address starts with 0x — find it in-game or in your EVE Vault wallet
           </p>
         </div>
       )}
 
-      {isLoading && <div className="loading">Loading hub data...</div>}
+      {isLoading && <div className="loading">Discovering your structures...</div>}
 
       {error && (
         <div className="error">
-          Failed to load hub: {String(error)}
+          Failed to load: {String(error)}
           <br />
-          <button onClick={() => refetch()} style={{ marginTop: "12px" }}>
-            Retry
-          </button>
+          <button onClick={() => refetch()} style={{ marginTop: "12px" }}>Retry</button>
         </div>
       )}
 
-      {data?.hub && (
-        <div>
-          <AssemblyCard assembly={data.hub} itemTypes={itemTypes} isHub onRefetch={refetch} />
+      {data && data.hubs.length === 0 && walletAddress && !isLoading && (
+        <div className="empty-state">
+          No network nodes found for this wallet address.
+        </div>
+      )}
 
-          {data.connected.length > 0 && (
+      {data && data.hubs.map((hub) => (
+        <div key={hub.id} style={{ marginBottom: "32px" }}>
+          <AssemblyCard assembly={hub} itemTypes={itemTypes} isHub onRefetch={refetch} />
+
+          {data.connected.filter(a =>
+            hub.connectedAssemblyIds.includes(a.id)
+          ).length > 0 && (
             <div className="section">
               <h2 className="section-title">
-                Connected Assemblies ({data.connected.length})
+                Connected Assemblies ({hub.connectedAssemblyIds.length})
               </h2>
-              {data.connected.map((a) => (
-                <AssemblyCard key={a.id} assembly={a} itemTypes={itemTypes} onRefetch={refetch} />
-              ))}
-            </div>
-          )}
-
-          {data.connected.length === 0 && (
-            <div
-              className="empty-state"
-              style={{ marginTop: "16px", padding: "24px" }}
-            >
-              No connected assemblies found
+              {data.connected
+                .filter(a => hub.connectedAssemblyIds.includes(a.id))
+                .map((a) => (
+                  <AssemblyCard key={a.id} assembly={a} itemTypes={itemTypes} onRefetch={refetch} />
+                ))}
             </div>
           )}
         </div>
-      )}
-
-      {data && !data.hub && (
-        <div className="empty-state">
-          No assembly found at this address. Make sure you entered a valid
-          object ID.
-        </div>
-      )}
+      ))}
     </div>
   );
 }

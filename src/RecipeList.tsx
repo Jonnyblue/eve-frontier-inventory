@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
 import { type Recipe, getRecipesForAssembly } from "./recipes";
+import { useItemTypes } from "./useItemTypes";
+import { buildNameToTypeIdMap } from "./worldApi";
+import { ItemIcon } from "./ItemIcon";
 
 function formatRunTime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -20,6 +23,11 @@ interface Props {
 export function RecipeList({ assemblyType }: Props) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { data: itemTypes } = useItemTypes();
+  const nameToTypeId = useMemo(
+    () => (itemTypes ? buildNameToTypeIdMap(itemTypes) : new Map<string, number>()),
+    [itemTypes],
+  );
 
   const allRecipes = useMemo(
     () => getRecipesForAssembly(assemblyType),
@@ -100,7 +108,7 @@ export function RecipeList({ assemblyType }: Props) {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {filtered.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} nameToTypeId={nameToTypeId} />
           ))}
         </div>
       )}
@@ -108,7 +116,7 @@ export function RecipeList({ assemblyType }: Props) {
   );
 }
 
-function RecipeCard({ recipe }: { recipe: Recipe }) {
+function RecipeCard({ recipe, nameToTypeId }: { recipe: Recipe; nameToTypeId: Map<string, number> }) {
   return (
     <div className="recipe-card">
       <div className="recipe-header">
@@ -134,6 +142,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
           <div className="recipe-side-label">Input</div>
           {recipe.inputs.map((item, i) => (
             <div key={i} className="recipe-item">
+              <ItemIcon typeId={nameToTypeId.get(item.name)} />
               <span>{item.name}</span>
               <span className="recipe-qty">{item.quantity.toLocaleString()}</span>
             </div>
@@ -146,6 +155,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
           <div className="recipe-side-label">Output</div>
           {recipe.outputs.map((item, i) => (
             <div key={i} className="recipe-item">
+              <ItemIcon typeId={nameToTypeId.get(item.name)} />
               <span>{item.name}</span>
               <span className="recipe-qty">{item.quantity.toLocaleString()}</span>
             </div>

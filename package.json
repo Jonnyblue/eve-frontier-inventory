@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "fetch-map-data": "node scripts/fetchMapData.mjs",
-    "ship": "pnpm build && scp -r dist/* public/bg.jpg root@72.60.192.95:/var/www/eve-industry/"
+    "ship": "pnpm build && scp -r dist/* public/bg.jpg root@72.60.192.95:/var/www/eve-industry/ && ssh root@72.60.192.95 'chmod -R 755 /var/www/eve-industry/'"
   },
   "dependencies": {
     "@evefrontier/dapp-kit": "^0.1.5",
