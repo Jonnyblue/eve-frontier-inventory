@@ -11,8 +11,7 @@ import { UniverseMap } from "./UniverseMap";
 import { useItemTypes } from "./useItemTypes";
 import { useHubInventory } from "./useInventory";
 
-const DEFAULT_HUB_ID =
-  "0xc746d1c0cf1f6a9446117d3a0fc4255e2f2bec38b8686250c05a21d83f3cf211";
+const HUB_ID_KEY = "eve-frontier-hub-id";
 
 function App() {
   const { handleConnect, handleDisconnect } = useConnection();
@@ -20,9 +19,18 @@ function App() {
   const [tab, setTab] = useState<
     "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map"
   >("calculator");
+  const [hubId, setHubId] = useState<string>(
+    () => localStorage.getItem(HUB_ID_KEY) ?? ""
+  );
   const manualInventory = useManualInventory();
   const { data: itemTypes } = useItemTypes();
-  const { data: hubData } = useHubInventory(DEFAULT_HUB_ID);
+  const { data: hubData } = useHubInventory(hubId || undefined);
+
+  const handleSetHubId = (id: string) => {
+    setHubId(id);
+    if (id) localStorage.setItem(HUB_ID_KEY, id);
+    else localStorage.removeItem(HUB_ID_KEY);
+  };
 
   // Collect SSU items from hub connected assemblies
   const ssuItems = hubData?.connected.filter((a) => a.items.length > 0);
@@ -102,9 +110,10 @@ function App() {
         <ManualInventory
           items={manualInventory.items}
           onUpdate={manualInventory.updateItems}
+          itemTypes={itemTypes}
         />
       ) : tab === "hub" ? (
-        <HubView />
+        <HubView hubId={hubId} onSetHubId={handleSetHubId} />
       ) : tab === "recipes" ? (
         <AllRecipes />
       ) : tab === "killboard" ? (

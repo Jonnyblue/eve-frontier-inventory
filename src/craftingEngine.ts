@@ -45,12 +45,12 @@ function pickBestRecipe(
     if (found) return found;
   }
 
-  // Prefer recipes where the item is the PRIMARY output (first in the list)
-  // Then prefer by assembly type priority
-  return allRecipes.sort((a, b) => {
-    const aIsPrimary = a.outputs[0]?.name === itemName ? 0 : 1;
-    const bIsPrimary = b.outputs[0]?.name === itemName ? 0 : 1;
-    if (aIsPrimary !== bIsPrimary) return aIsPrimary - bIsPrimary;
+  // Prefer the recipe that yields the MOST of the target item per run,
+  // then break ties by assembly type priority (dedicated machines over refineries)
+  return allRecipes.slice().sort((a, b) => {
+    const aQty = a.outputs.find((o) => o.name === itemName)?.quantity ?? 0;
+    const bQty = b.outputs.find((o) => o.name === itemName)?.quantity ?? 0;
+    if (bQty !== aQty) return bQty - aQty; // more output = better
 
     const aPri = ASSEMBLY_PRIORITY[a.assemblyType] ?? 99;
     const bPri = ASSEMBLY_PRIORITY[b.assemblyType] ?? 99;

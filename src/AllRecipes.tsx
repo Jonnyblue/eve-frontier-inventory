@@ -5,8 +5,10 @@ import type { Recipe } from "./recipes";
 const ASSEMBLY_TYPES: { key: Recipe["assemblyType"]; label: string }[] = [
   { key: "refinery", label: "Refinery" },
   { key: "mini_printer", label: "Mini Printer" },
+  { key: "printer", label: "Printer" },
   { key: "assembler", label: "Assembler" },
   { key: "mini_berth", label: "Mini Berth" },
+  { key: "berth", label: "Berth" },
 ];
 
 export function AllRecipes() {

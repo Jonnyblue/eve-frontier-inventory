@@ -28,6 +28,7 @@ export function CraftingCalculator({
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [quantityInput, setQuantityInput] = useState("1");
   const [showDropdown, setShowDropdown] = useState(false);
   const [view, setView] = useState<"raw" | "all" | "tree">("raw");
   // User recipe overrides: material name -> recipe id
@@ -113,10 +114,17 @@ export function CraftingCalculator({
                 textAlign: "center",
               }}
               min={1}
-              value={quantity}
-              onChange={(e) =>
-                setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-              }
+              value={quantityInput}
+              onChange={(e) => {
+                setQuantityInput(e.target.value);
+                const n = parseInt(e.target.value);
+                if (!isNaN(n) && n >= 1) setQuantity(n);
+              }}
+              onBlur={() => {
+                const n = parseInt(quantityInput);
+                if (isNaN(n) || n < 1) { setQuantityInput("1"); setQuantity(1); }
+                else setQuantityInput(String(n));
+              }}
             />
           </div>
         </div>
@@ -181,6 +189,13 @@ export function CraftingCalculator({
                   }}
                 >
                   {tree.batchesNeeded} batch{tree.batchesNeeded !== 1 ? "es" : ""}
+                  {(() => {
+                    const outputQty = tree.recipe!.outputs.find(o => o.name === selectedItem)?.quantity ?? 1;
+                    const total = tree.batchesNeeded * outputQty;
+                    return outputQty > 1
+                      ? ` → ${total} ${selectedItem} (${outputQty}/batch)`
+                      : ` → ${total} ${selectedItem}`;
+                  })()}
                 </span>
               </div>
 

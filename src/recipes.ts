@@ -10,7 +10,7 @@ export interface Recipe {
   runTime: number; // seconds
   inputs: RecipeItem[];
   outputs: RecipeItem[];
-  assemblyType: "refinery" | "mini_berth" | "mini_printer" | "assembler";
+  assemblyType: "refinery" | "mini_berth" | "mini_printer" | "assembler" | "printer" | "berth";
 }
 
 export const recipes: Recipe[] = [
@@ -796,6 +796,131 @@ export const recipes: Recipe[] = [
   { id: "asm-stasis-net-ii", category: "Stasis Web", name: "Stasis Net II", runTime: 178, inputs: [{ name: "Printed Circuits", quantity: 2 }, { name: "Reinforced Alloys", quantity: 2 }, { name: "Thermal Composites", quantity: 4 }], outputs: [{ name: "Stasis Net II", quantity: 1 }], assemblyType: "assembler" },
   { id: "asm-stasis-net-iii", category: "Stasis Web", name: "Stasis Net III", runTime: 366, inputs: [{ name: "Printed Circuits", quantity: 2 }, { name: "Reinforced Alloys", quantity: 3 }, { name: "Thermal Composites", quantity: 4 }], outputs: [{ name: "Stasis Net III", quantity: 1 }], assemblyType: "assembler" },
   { id: "asm-stasis-net-iv", category: "Stasis Web", name: "Stasis Net IV", runTime: 760, inputs: [{ name: "Printed Circuits", quantity: 3 }, { name: "Reinforced Alloys", quantity: 3 }, { name: "Thermal Composites", quantity: 5 }], outputs: [{ name: "Stasis Net IV", quantity: 1 }], assemblyType: "assembler" },
+
+  // Batched Manufacturing Materials
+  { id: "ptr-batched-carbon-weave", category: "Batched Material", name: "Batched Carbon Weave", runTime: 6, inputs: [{ name: "Carbon Weave", quantity: 30 }], outputs: [{ name: "Batched Carbon Weave", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-batched-printed-circuits", category: "Batched Material", name: "Batched Printed Circuits", runTime: 6, inputs: [{ name: "Printed Circuits", quantity: 30 }], outputs: [{ name: "Batched Printed Circuits", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-batched-reinforced-alloys", category: "Batched Material", name: "Batched Reinforced Alloys", runTime: 7, inputs: [{ name: "Reinforced Alloys", quantity: 30 }], outputs: [{ name: "Batched Reinforced Alloys", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-batched-thermal-composites", category: "Batched Material", name: "Batched Thermal Composites", runTime: 7, inputs: [{ name: "Thermal Composites", quantity: 30 }], outputs: [{ name: "Batched Thermal Composites", quantity: 1 }], assemblyType: "printer" },
+
+  // Exotronic Frames
+  { id: "ptr-apocalypse-protocol-frame", category: "Exotronic Frames", name: "Apocalypse Protocol Frame", runTime: 46, inputs: [{ name: "Still Knot", quantity: 5 }, { name: "Echo Chamber", quantity: 1 }, { name: "Kerogen Tar", quantity: 120 }], outputs: [{ name: "Apocalypse Protocol Frame", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-archangel-protocol-frame", category: "Exotronic Frames", name: "Archangel Protocol Frame", runTime: 31, inputs: [{ name: "Still Knot", quantity: 5 }, { name: "Echo Chamber", quantity: 1 }, { name: "Kerogen Tar", quantity: 30 }], outputs: [{ name: "Archangel Protocol Frame", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-bastion-program-frame", category: "Exotronic Frames", name: "Bastion Program Frame", runTime: 31, inputs: [{ name: "Still Knot", quantity: 5 }, { name: "Echo Chamber", quantity: 1 }, { name: "Kerogen Tar", quantity: 30 }], outputs: [{ name: "Bastion Program Frame", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-exterminata-protocol-frame", category: "Exotronic Frames", name: "Exterminata Protocol Frame", runTime: 31, inputs: [{ name: "Still Knot", quantity: 1 }, { name: "Echo Chamber", quantity: 1 }, { name: "Kerogen Tar", quantity: 30 }], outputs: [{ name: "Exterminata Protocol Frame", quantity: 1 }], assemblyType: "printer" },
+
+  // Asteroid Mining Crystals
+  { id: "ptr-eclipsite-mining-lens", category: "Asteroid Mining Crystal", name: "Eclipsite Mining Lens", runTime: 6, inputs: [{ name: "Silicon Dust", quantity: 80 }, { name: "Eclipsite", quantity: 1 }], outputs: [{ name: "Eclipsite Mining Lens", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-granocite-mining-lens", category: "Asteroid Mining Crystal", name: "Granocite Mining Lens", runTime: 5, inputs: [{ name: "Silicon Dust", quantity: 45 }, { name: "Granocite", quantity: 1 }], outputs: [{ name: "Granocite Mining Lens", quantity: 1 }], assemblyType: "printer" },
+
+  // Nanite Sequencers
+  { id: "ptr-em-nanite-sequencer", category: "Nanite Sequencer", name: "EM Nanite Sequencer", runTime: 49, inputs: [{ name: "Printed Circuits", quantity: 1 }, { name: "Carbon Weave", quantity: 1 }], outputs: [{ name: "EM Nanite Sequencer", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-explosive-nanite-sequencer", category: "Nanite Sequencer", name: "Explosive Nanite Sequencer", runTime: 222, inputs: [{ name: "Printed Circuits", quantity: 1 }, { name: "Thermal Composites", quantity: 1 }], outputs: [{ name: "Explosive Nanite Sequencer", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-kinetic-nanite-sequencer", category: "Nanite Sequencer", name: "Kinetic Nanite Sequencer", runTime: 222, inputs: [{ name: "Printed Circuits", quantity: 1 }, { name: "Thermal Composites", quantity: 1 }], outputs: [{ name: "Kinetic Nanite Sequencer", quantity: 1 }], assemblyType: "printer" },
+  { id: "ptr-thermal-nanite-sequencer", category: "Nanite Sequencer", name: "Thermal Nanite Sequencer", runTime: 222, inputs: [{ name: "Printed Circuits", quantity: 1 }, { name: "Thermal Composites", quantity: 1 }], outputs: [{ name: "Thermal Nanite Sequencer", quantity: 1 }], assemblyType: "printer" },
+
+  // Tier 2 Ammunition
+  { id: "ptr-ac-gyrojet-ammo-2-s", category: "Gyrojet Ammunition", name: "AC Gyrojet Ammo 2 (S)", runTime: 5, inputs: [{ name: "Nickel-Iron Veins", quantity: 230 }], outputs: [{ name: "AC Gyrojet Ammo 2 (S)", quantity: 100 }], assemblyType: "printer" },
+  { id: "ptr-ac-gyrojet-ammo-3-s", category: "Gyrojet Ammunition", name: "AC Gyrojet Ammo 3 (S)", runTime: 5, inputs: [{ name: "Nickel-Iron Veins", quantity: 230 }], outputs: [{ name: "AC Gyrojet Ammo 3 (S)", quantity: 100 }], assemblyType: "printer" },
+  { id: "ptr-em-disintegrator-charge-m", category: "EM Charge", name: "EM Disintegrator Charge (M)", runTime: 3, inputs: [{ name: "Nickel-Iron Veins", quantity: 60 }, { name: "Platinum-Group Veins", quantity: 60 }], outputs: [{ name: "EM Disintegrator Charge (M)", quantity: 100 }], assemblyType: "printer" },
+  { id: "ptr-em-disintegrator-charge-s", category: "EM Charge", name: "EM Disintegrator Charge (S)", runTime: 3, inputs: [{ name: "Nickel-Iron Veins", quantity: 20 }, { name: "Platinum-Group Veins", quantity: 20 }], outputs: [{ name: "EM Disintegrator Charge (S)", quantity: 100 }], assemblyType: "printer" },
+  { id: "ptr-rapid-plasma-ammo-2-s", category: "Plasma Charge", name: "Rapid Plasma Ammo 2 (S)", runTime: 5, inputs: [{ name: "Platinum-Group Veins", quantity: 400 }, { name: "Troilite Sulfide Grains", quantity: 400 }], outputs: [{ name: "Rapid Plasma Ammo 2 (S)", quantity: 100 }], assemblyType: "printer" },
+
+  // Fusion Fuel
+  { id: "ptr-sof-80-fuel", category: "Fusion Fuel", name: "SOF-80 Fuel", runTime: 30, inputs: [{ name: "Catalytic Dust", quantity: 44 }, { name: "SOF-40 Fuel", quantity: 500 }], outputs: [{ name: "SOF-80 Fuel", quantity: 500 }], assemblyType: "printer" },
+
+  // === Berth Recipes (full-size ship berth) ===
+
+  // Frigates
+  {
+    id: "berth-lorha",
+    category: "Frigate",
+    name: "LORHA",
+    runTime: 8320,
+    inputs: [
+      { name: "Bastion Program Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 58 },
+      { name: "Batched Carbon Weave", quantity: 29 },
+      { name: "Batched Thermal Composites", quantity: 29 },
+    ],
+    outputs: [{ name: "LORHA", quantity: 1 }],
+    assemblyType: "berth",
+  },
+  {
+    id: "berth-haf",
+    category: "Frigate",
+    name: "HAF",
+    runTime: 82800,
+    inputs: [
+      { name: "Exterminata Protocol Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 160 },
+      { name: "Batched Carbon Weave", quantity: 74 },
+      { name: "Batched Thermal Composites", quantity: 74 },
+    ],
+    outputs: [{ name: "HAF", quantity: 1 }],
+    assemblyType: "berth",
+  },
+  {
+    id: "berth-lai",
+    category: "Frigate",
+    name: "LAI",
+    runTime: 78000,
+    inputs: [
+      { name: "Exterminata Protocol Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 80 },
+      { name: "Batched Carbon Weave", quantity: 70 },
+      { name: "Batched Thermal Composites", quantity: 70 },
+      { name: "Still Kernel", quantity: 4 },
+    ],
+    outputs: [{ name: "LAI", quantity: 1 }],
+    assemblyType: "berth",
+  },
+  {
+    id: "berth-mcf",
+    category: "Frigate",
+    name: "MCF",
+    runTime: 79200,
+    inputs: [
+      { name: "Exterminata Protocol Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 88 },
+      { name: "Batched Carbon Weave", quantity: 48 },
+      { name: "Batched Thermal Composites", quantity: 48 },
+      { name: "Still Kernel", quantity: 3 },
+    ],
+    outputs: [{ name: "MCF", quantity: 1 }],
+    assemblyType: "berth",
+  },
+  {
+    id: "berth-usv",
+    category: "Frigate",
+    name: "USV",
+    runTime: 8200,
+    inputs: [
+      { name: "Archangel Protocol Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 56 },
+      { name: "Batched Carbon Weave", quantity: 28 },
+      { name: "Batched Thermal Composites", quantity: 28 },
+    ],
+    outputs: [{ name: "USV", quantity: 1 }],
+    assemblyType: "berth",
+  },
+
+  // Destroyers
+  {
+    id: "berth-tades",
+    category: "Destroyer",
+    name: "TADES",
+    runTime: 151200,
+    inputs: [
+      { name: "Apocalypse Protocol Frame", quantity: 1 },
+      { name: "Batched Reinforced Alloys", quantity: 124 },
+      { name: "Batched Carbon Weave", quantity: 72 },
+      { name: "Batched Thermal Composites", quantity: 72 },
+      { name: "Still Kernel", quantity: 4 },
+    ],
+    outputs: [{ name: "TADES", quantity: 1 }],
+    assemblyType: "berth",
+  },
 ];
 
 export function getRecipesForAssembly(

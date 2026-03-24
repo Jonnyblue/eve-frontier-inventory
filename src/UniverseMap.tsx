@@ -77,7 +77,8 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
   const { links: gateLinks, isLoading: linksLoading, progress: linksProgress } = useGateLinks(showLinks);
 
   // Camera: orbit around origin, offsetX/Y is a 2D screen-space pan on top
-  const cam = useRef({ offsetX: 0, offsetY: 0, scale: 0.85, rotX: 0.5, rotY: 0.3, pivotX: 0, pivotY: 0, pivotZ: 0 });
+  // Axis convention: (nx, nz, -ny) → (scene x, scene y, scene z) per community findings
+  const cam = useRef({ offsetX: 0, offsetY: 0, scale: 0.85, rotX: 0.15, rotY: 0.3, pivotX: 0, pivotY: 0, pivotZ: 0 });
   const drag = useRef({ active: false, button: 0, lastMX: 0, lastMY: 0, totalDist: 0 });
   const size = useRef({ w: 900, h: 600 });
 
@@ -103,6 +104,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
   // UI state
   const [hovered, setHovered] = useState<{ sys: SystemPoint; kills: number; structs: AssemblyData[]; x: number; y: number } | null>(null);
   const [showKills, setShowKills] = useState(true);
+  const [killWindow, setKillWindow] = useState<number>(24); // hours; 0 = all time
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState<"grab" | "grabbing">("grab");
 
@@ -130,7 +132,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
     let hovSys: [number, number] | null = null;
 
     for (const sys of systemsRef.current) {
-      const [x2, y2, z2] = rotate3D(sys.nx - pivotX, sys.ny - pivotY, sys.nz - pivotZ, rotX, rotY);
+      const [x2, y2, z2] = rotate3D(sys.nx - pivotX, sys.nz - pivotY, -sys.ny - pivotZ, rotX, rotY);
       const sx = x2 * ppu + W / 2 + offsetX;
       const sy = -y2 * ppu + H / 2 + offsetY;
       proj.set(sys.id, [sx, sy, z2]);
@@ -200,7 +202,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
     for (const asm of structuresRef.current) {
       const sys = byIdRef.current.get(asm.solarSystemId);
       if (!sys) continue;
-      const [x2, y2, z2] = rotate3D(sys.nx - pivotX, sys.ny - pivotY, sys.nz - pivotZ, rotX, rotY);
+      const [x2, y2, z2] = rotate3D(sys.nx - pivotX, sys.nz - pivotY, -sys.ny - pivotZ, rotX, rotY);
       const sx = x2 * ppu + W / 2 + offsetX;
       const sy = -y2 * ppu + H / 2 + offsetY;
       if (sx < -12 || sx > W + 12 || sy < -12 || sy > H + 12) continue;
@@ -260,12 +262,15 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
 
   useEffect(() => {
     const m = new Map<number, number>();
+    const cutoff = killWindow > 0 ? Date.now() - killWindow * 3_600_000 : 0;
     for (const k of kills ?? []) {
-      if (k.solarSystemId) m.set(k.solarSystemId, (m.get(k.solarSystemId) ?? 0) + 1);
+      if (!k.solarSystemId) continue;
+      if (cutoff > 0 && k.killTimestamp < cutoff) continue;
+      m.set(k.solarSystemId, (m.get(k.solarSystemId) ?? 0) + 1);
     }
     killCountsRef.current = m;
     draw();
-  }, [kills, draw]);
+  }, [kills, killWindow, draw]);
 
   useEffect(() => {
     showKillsRef.current = showKills;
@@ -306,7 +311,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
     let nearest: SystemPoint | null = null;
     let minDist = RADIUS_SQ;
     for (const sys of systemsRef.current) {
-      const [x2, y2] = rotate3D(sys.nx - pivotX, sys.ny - pivotY, sys.nz - pivotZ, rotX, rotY);
+      const [x2, y2] = rotate3D(sys.nx - pivotX, sys.nz - pivotY, -sys.ny - pivotZ, rotX, rotY);
       const sx = x2 * ppu + W / 2 + offsetX;
       const sy = -y2 * ppu + H / 2 + offsetY;
       const d = (sx - mx) ** 2 + (sy - my) ** 2;
@@ -376,8 +381,8 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
       if (nearest) {
         const { w: W, h: H } = size.current;
         cam.current.pivotX = nearest.nx;
-        cam.current.pivotY = nearest.ny;
-        cam.current.pivotZ = nearest.nz;
+        cam.current.pivotY = nearest.nz;
+        cam.current.pivotZ = -nearest.ny;
         cam.current.offsetX = 0;
         cam.current.offsetY = 0;
         hovIdRef.current = nearest.id;
@@ -419,8 +424,8 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
       const { w: W, h: H } = size.current;
       cam.current.scale = 3;
       cam.current.pivotX = sys.nx;
-      cam.current.pivotY = sys.ny;
-      cam.current.pivotZ = sys.nz;
+      cam.current.pivotY = sys.nz;
+      cam.current.pivotZ = -sys.ny;
       cam.current.offsetX = 0;
       cam.current.offsetY = 0;
       hovIdRef.current = sys.id;
@@ -430,7 +435,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
   };
 
   const resetView = () => {
-    cam.current = { offsetX: 0, offsetY: 0, scale: 0.85, rotX: 0.5, rotY: 0.3, pivotX: 0, pivotY: 0, pivotZ: 0 };
+    cam.current = { offsetX: 0, offsetY: 0, scale: 0.85, rotX: 0.15, rotY: 0.3, pivotX: 0, pivotY: 0, pivotZ: 0 };
     draw();
   };
 
@@ -461,6 +466,25 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
         >
           {showKills ? "Hide" : "Show"} Kills
         </button>
+        {showKills && (
+          <select
+            value={killWindow}
+            onChange={(e) => setKillWindow(Number(e.target.value))}
+            style={{
+              fontSize: "0.8rem", padding: "4px 8px",
+              background: "#0b0b0b",
+              border: "1px solid rgba(250,250,229,0.2)",
+              color: "rgba(250,250,229,0.7)",
+            }}
+          >
+            <option value={1} style={{ background: "#0b0b0b", color: "#fafae5" }}>Last 1h</option>
+            <option value={6} style={{ background: "#0b0b0b", color: "#fafae5" }}>Last 6h</option>
+            <option value={24} style={{ background: "#0b0b0b", color: "#fafae5" }}>Last 24h</option>
+            <option value={72} style={{ background: "#0b0b0b", color: "#fafae5" }}>Last 3d</option>
+            <option value={168} style={{ background: "#0b0b0b", color: "#fafae5" }}>Last 7d</option>
+            <option value={0} style={{ background: "#0b0b0b", color: "#fafae5" }}>All time</option>
+          </select>
+        )}
         <button
           onClick={() => setShowLinks((v) => !v)}
           style={{
@@ -492,7 +516,7 @@ export function UniverseMap({ structures = [] }: { structures?: AssemblyData[] }
         </span>
         <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
           {systems.length > 0 && `${systems.length.toLocaleString()} systems`}
-          {(kills?.length ?? 0) > 0 && ` · ${kills!.length} kills`}
+          {(kills?.length ?? 0) > 0 && ` · ${Array.from(killCountsRef.current.values()).reduce((a, b) => a + b, 0)} kills`}
         </span>
       </div>
 

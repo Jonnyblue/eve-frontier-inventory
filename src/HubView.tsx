@@ -3,13 +3,14 @@ import { useHubInventory } from "./useInventory";
 import { useItemTypes } from "./useItemTypes";
 import { AssemblyCard } from "./AssemblyCard";
 
-const DEFAULT_HUB_ID =
-  "0xc746d1c0cf1f6a9446117d3a0fc4255e2f2bec38b8686250c05a21d83f3cf211";
+interface HubViewProps {
+  hubId: string;
+  onSetHubId: (id: string) => void;
+}
 
-export function HubView() {
-  const [hubId, setHubId] = useState(DEFAULT_HUB_ID);
-  const [inputValue, setInputValue] = useState(DEFAULT_HUB_ID);
-  const { data, isLoading, error, refetch } = useHubInventory(hubId);
+export function HubView({ hubId, onSetHubId }: HubViewProps) {
+  const [inputValue, setInputValue] = useState(hubId);
+  const { data, isLoading, error, refetch } = useHubInventory(hubId || undefined);
   const { data: itemTypes } = useItemTypes();
 
   return (
@@ -23,11 +24,20 @@ export function HubView() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") setHubId(inputValue.trim());
+            if (e.key === "Enter") onSetHubId(inputValue.trim());
           }}
         />
-        <button onClick={() => setHubId(inputValue.trim())}>Load</button>
+        <button onClick={() => onSetHubId(inputValue.trim())}>Load</button>
       </div>
+
+      {!hubId && (
+        <div className="empty-state">
+          <p>Enter your Network Node object ID above to load your hub</p>
+          <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", marginTop: "8px" }}>
+            Find it in-game or on the EVE Frontier explorer. It starts with 0x...
+          </p>
+        </div>
+      )}
 
       {isLoading && <div className="loading">Loading hub data...</div>}
 
