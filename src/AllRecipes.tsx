@@ -16,13 +16,7 @@ export function AllRecipes() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="tab-bar" style={{ marginBottom: "20px" }}>
         {ASSEMBLY_TYPES.map((t) => (
           <button
             key={t.key}
