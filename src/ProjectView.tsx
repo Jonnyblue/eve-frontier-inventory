@@ -136,7 +136,7 @@ function ProjectSetup({ onStart }: { onStart: (p: ProjectParams) => void }) {
 }
 
 function ProjectProgress({ params, onReset }: { params: ProjectParams; onReset: () => void }) {
-  const { data: ssu, isLoading } = useAssembly(params.ssuId);
+  const { data: ssu, isLoading, refetch } = useAssembly(params.ssuId);
   const { data: itemTypes } = useItemTypes();
   const [copied, setCopied] = useState(false);
 
@@ -189,6 +189,9 @@ function ProjectProgress({ params, onReset }: { params: ProjectParams; onReset: 
           <span style={{ color: "var(--color-success)", fontSize: "0.85rem" }}>✓ Ready to build</span>
         )}
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+          <button onClick={() => refetch()} style={{ fontSize: "0.75rem" }} disabled={isLoading}>
+            {isLoading ? "Refreshing…" : "Refresh"}
+          </button>
           <button onClick={copyUrl} style={{ fontSize: "0.75rem" }}>
             {copied ? "Copied!" : "Copy Link"}
           </button>
