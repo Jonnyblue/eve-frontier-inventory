@@ -11,13 +11,13 @@ import { usePlayerHubs } from "./useInventory";
 import { useConnection } from "@evefrontier/dapp-kit";
 import { ProjectView } from "./ProjectView";
 
+const _params = new URLSearchParams(window.location.search);
+const isDappView = _params.has("item") && _params.has("ssu");
+
 function App() {
   const [tab, setTab] = useState<
     "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map" | "project"
-  >(() => {
-    const p = new URLSearchParams(window.location.search);
-    return p.has("item") && p.has("ssu") ? "project" : "calculator";
-  });
+  >("calculator");
   const { walletAddress, isConnected, hasEveVault, handleConnect, handleDisconnect } = useConnection();
 
   const manualInventory = useManualInventory();
@@ -26,6 +26,14 @@ function App() {
 
   // Collect SSU items from all hubs' connected assemblies
   const ssuItems = playerData?.connected.filter((a) => a.items.length > 0);
+
+  if (isDappView) {
+    return (
+      <div className="app-container">
+        <ProjectView />
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
