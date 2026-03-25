@@ -9,11 +9,15 @@ import { UniverseMap } from "./UniverseMap";
 import { useItemTypes } from "./useItemTypes";
 import { usePlayerHubs } from "./useInventory";
 import { useConnection } from "@evefrontier/dapp-kit";
+import { ProjectView } from "./ProjectView";
 
 function App() {
   const [tab, setTab] = useState<
-    "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map"
-  >("calculator");
+    "hub" | "lookup" | "recipes" | "inventory" | "calculator" | "killboard" | "map" | "project"
+  >(() => {
+    const p = new URLSearchParams(window.location.search);
+    return p.has("item") && p.has("ssu") ? "project" : "calculator";
+  });
   const { walletAddress, isConnected, hasEveVault, handleConnect, handleDisconnect } = useConnection();
 
   const manualInventory = useManualInventory();
@@ -79,6 +83,12 @@ function App() {
         >
           Map
         </button>
+        <button
+          className={`tab ${tab === "project" ? "active" : ""}`}
+          onClick={() => setTab("project")}
+        >
+          Project
+        </button>
       </div>
 
       {tab === "calculator" ? (
@@ -104,6 +114,8 @@ function App() {
           ...(playerData?.hubs ?? []),
           ...(playerData?.connected ?? []),
         ]} />
+      ) : tab === "project" ? (
+        <ProjectView />
       ) : (
         <AssemblyLookup />
       )}
